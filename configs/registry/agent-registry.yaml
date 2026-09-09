@@ -1,0 +1,67 @@
+# Agent 注册表描述身份和权限上限，不构成任务授权。
+# 未知 Agent 默认拒绝，V1.0 不绑定具体实现。
+version: "1.0"
+default_action: deny
+
+# 空清单表示当前没有 Agent 被注册或启用。
+agents: []
+
+# 未来 Agent 条目的最低结构。
+entry_schema:
+  required_fields:
+    - id
+    - name
+    - type
+    - adapter
+    - version
+    - status
+    - capabilities
+    - permissions
+    - memory_access
+    - tool_access
+  fields:
+    id: {type: string}
+    name: {type: string}
+    type: {type: string}
+    adapter: {type: string}
+    version: {type: string}
+    status: {enum: [disabled, enabled, degraded]}
+    # 能力可扩展，但仍需 Runtime 与 Policy Engine 识别。
+    capabilities:
+      type: array
+      allowed_values: [coding, analysis, automation, robotics]
+      extensible: true
+    # 最终授权取 Agent、用户、任务、Tool 与环境交集。
+    permissions:
+      type: array
+      enum: [READONLY, CONTROLLED, ADMIN]
+    # Memory 默认不可读写，必须按层显式授予。
+    memory_access:
+      type: object
+      fields:
+        read_layers: {type: array}
+        write_layers: {type: array}
+      default: {read_layers: [], write_layers: []}
+    # 空 allow 与 deny "*" 保证没有隐式工具能力。
+    tool_access:
+      type: object
+      fields:
+        allow: {type: array}
+        deny: {type: array}
+      default: {allow: [], deny: ["*"]}
+
+# 字段缺省时保持 Agent 禁用且无权限。
+defaults:
+  status: disabled
+  permissions: []
+  memory_access: {read_layers: [], write_layers: []}
+  tool_access: {allow: [], deny: ["*"]}
+
+# 拒绝重复 ID 和未知权限枚举。
+validation:
+  unique_key: id
+  permission_enum: [READONLY, CONTROLLED, ADMIN]
+  reject_unknown_permissions: true
+
+# 未来 execution_scope 仍需 Validator 检查。
+extensions: {}

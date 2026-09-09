@@ -1,0 +1,46 @@
+# Agent Runtime 声明式边界，不绑定具体 Agent 或 LLM。
+# 配置不包含凭据，也不会自行启动服务。
+version: "1.0"
+contract_version: "1.0"
+
+# 任务硬预算用于阻止无界规划和工具循环。
+runtime:
+  max_task_time_seconds: 1800
+  max_tool_calls: 25
+  # 只恢复已分类为可恢复且可安全重试的失败。
+  automatic_recovery:
+    enabled: true
+    max_attempts: 3
+    backoff_seconds: 2
+    # 恢复过程永远不能提升原任务权限。
+    allow_permission_escalation: false
+  # 生命周期状态与等待原因分离，兼容规则见 interfaces.md。
+  human_approval:
+    enabled: true
+    readonly_default: automatic
+    controlled_default: policy_based
+    admin_default: always_required
+    wait_status: waiting_human
+    approval_wait_reason: requires_approval
+
+# revision 和转换事件用于并发控制、恢复与审计。
+state_machine:
+  initial_status: accepted
+  terminal_statuses: [succeeded, failed, cancelled]
+  persist_revision: true
+  emit_transition_events: true
+
+# 补充 Runtime 主预算，Tool 仍受自身超时限制。
+limits:
+  max_plan_steps: 100
+  max_recovery_time_seconds: 300
+  tool_timeout_ceiling_seconds: 120
+
+# fail closed：注册或审计链缺失时禁止执行。
+security:
+  default_action: deny
+  require_registered_tools: true
+  require_audit_id: true
+
+# 扩展不得覆盖 security 拒绝规则。
+extensions: {}

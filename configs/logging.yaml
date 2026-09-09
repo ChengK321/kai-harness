@@ -1,0 +1,32 @@
+# Kai 日志策略；日志写入前必须结构化并脱敏。
+# 本文件不创建服务，也不得包含任何凭据。
+version: "1.0"
+
+logging:
+  # 生产默认级别；提高详细度时仍不得记录原始敏感内容。
+  level: INFO
+  format: json
+  destination: /opt/kai/logs/kai.jsonl
+  include_timestamp: true
+  include_correlation_id: true
+  # 字段名匹配只是基础防线，还应处理嵌套值、Header 和自由文本。
+  redact_fields:
+    - password
+    - token
+    - secret
+    - authorization
+    - api_key
+    - private_key
+  # 限制本地磁盘占用；长期保留由外部合规策略决定。
+  rotation:
+    enabled: true
+    max_size_mb: 100
+    retained_files: 14
+  # 审计日志采用追加语义，存储层还需访问控制与防篡改。
+  audit:
+    enabled: true
+    destination: /opt/kai/logs/audit.jsonl
+    append_only: true
+
+# 扩展不得绕过脱敏、轮转或审计。
+extensions: {}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kai.local/schema/environment.schema.json",
+  "title": "Kai Environment Request V1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "request_id", "operation", "target", "parameters", "timeout", "audit_id"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "operation": {"enum": ["observe", "execute", "status"]},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment_id", "resource_type", "resource_id"],
+      "properties": {
+        "environment_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "resource_type": {"type": "string", "minLength": 1, "maxLength": 128},
+        "resource_id": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    },
+    "parameters": {"type": "object", "additionalProperties": true},
+    "permission_level": {"enum": ["READONLY", "CONTROLLED", "ADMIN"]},
+    "timeout": {"type": "integer", "minimum": 1, "maximum": 3600},
+    "audit_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 256},
+    "safety_constraints": {"type": "object", "additionalProperties": true},
+    "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"operation": {"const": "execute"}}},
+      "then": {"required": ["permission_level", "idempotency_key", "safety_constraints"]}
+    }
+  ]
+}

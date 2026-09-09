@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kai.local/schema/memory.schema.json",
+  "title": "Kai Memory Record V1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["memory_id", "layer", "namespace", "content", "metadata", "revision"],
+  "properties": {
+    "memory_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "layer": {"enum": ["working", "episodic", "semantic", "user", "system"]},
+    "namespace": {"type": "string", "minLength": 1, "maxLength": 256},
+    "content": {"type": "object", "additionalProperties": true},
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_type", "source_id", "created_by", "confidence", "verified", "created_at", "updated_at", "classification", "schema_version"],
+      "properties": {
+        "source_type": {"type": "string", "enum": ["user_input", "agent_inference", "system_generated"]},
+        "source_id": {"type": "string", "minLength": 1},
+        "created_by": {"type": "string", "minLength": 1},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "verified": {"type": "boolean"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "classification": {"enum": ["public", "internal", "confidential", "restricted"]},
+        "schema_version": {"type": "string", "minLength": 1},
+        "expires_at": {"type": ["string", "null"], "format": "date-time"},
+        "tags": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "extensions": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "revision": {"type": "integer", "minimum": 1},
+    "extensions": {"type": "object", "additionalProperties": true}
+  }
+}

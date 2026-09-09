@@ -1,0 +1,54 @@
+# MCP 统一注册表；加载配置不会主动建立连接。
+# Server 默认禁用，endpoint 禁止内嵌凭据。
+version: "1.0"
+default_action: deny
+
+# 空清单表示当前没有获准连接的 MCP Server。
+servers: []
+
+# 未来 Server 条目的最低结构要求。
+entry_schema:
+  required_fields:
+    - server_id
+    - transport
+    - endpoint
+    - tools
+    - health_check
+    - enabled
+  fields:
+    server_id: {type: string}
+    transport:
+      enum: [stdio, streamable_http, sse]
+    endpoint:
+      type: [string, "null"]
+    tools:
+      type: array
+    health_check:
+      type: object
+      fields:
+        enabled: {type: boolean}
+        interval_seconds: {type: integer}
+        timeout_seconds: {type: integer}
+    enabled: {type: boolean}
+
+# 缺省保持 Server 与健康检查关闭，避免隐式网络访问。
+defaults:
+  enabled: false
+  transport: stdio
+  endpoint: null
+  tools: []
+  health_check:
+    enabled: false
+    interval_seconds: 60
+    timeout_seconds: 10
+
+# server_id 唯一，工具还必须在 Tool Registry 注册。
+validation:
+  unique_key: server_id
+  transport_enum: [stdio, streamable_http, sse]
+  allow_unregistered_servers: false
+  require_registered_tools: true
+  reject_embedded_credentials: true
+
+# 扩展不得绕过注册、交叉验证或凭据检查。
+extensions: {}

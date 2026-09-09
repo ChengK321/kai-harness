@@ -1,0 +1,59 @@
+# Tool 注册表；仅显式注册且启用的工具进入策略判定。
+# 注册或 enabled 均不等于授权，Executor 必须复核。
+version: "1.0"
+default_action: deny
+
+# 当前为空，因此不存在可调用工具。
+tools: []
+
+# 未来 Tool 条目的必填结构与合法枚举。
+entry_schema:
+  required_fields:
+    - id
+    - name
+    - version
+    - category
+    - description
+    - permission_level
+    - timeout
+    - requires_approval
+    - enabled
+  fields:
+    id: {type: string}
+    name: {type: string}
+    version: {type: string}
+    category:
+      enum: [system, docker, filesystem, network, mcp, robotics]
+    description: {type: string}
+    # 调用方不能降低注册的最低权限要求。
+    permission_level:
+      enum: [READONLY, CONTROLLED, ADMIN]
+    # 工具超时仍受 Runtime 全局上限约束。
+    timeout:
+      type: integer
+      minimum: 1
+    requires_approval: {type: boolean}
+    enabled: {type: boolean}
+
+# 工具缺省禁用；审批默认开启是保守策略。
+defaults:
+  enabled: false
+  permission_level: READONLY
+  requires_approval: true
+  timeout: 30
+
+# ADMIN 与未来 irreversible 副作用必须人工审批。
+risk_policy:
+  high_risk_permission_levels: [ADMIN]
+  high_risk_requires_approval: true
+  controlled_requires_policy_evaluation: true
+
+# 拒绝重复 ID、未知分类和非法权限。
+validation:
+  unique_key: id
+  permission_enum: [READONLY, CONTROLLED, ADMIN]
+  category_enum: [system, docker, filesystem, network, mcp, robotics]
+  reject_unknown_permissions: true
+
+# 未来 side_effect 枚举由 Validator 固定检查。
+extensions: {}

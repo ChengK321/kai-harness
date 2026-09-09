@@ -1,0 +1,56 @@
+# Environment 注册表；登记不会连接环境或授予控制权。
+# 执行默认拒绝，并必须经过 Executor 与安全策略。
+version: "1.0"
+default_action: deny
+
+# 条目描述能力和安全边界，不是实时连接探测。
+environments:
+  # 当前唯一条目只是 VPS 声明式元数据。
+  - id: vps-primary
+    type: linux_vps
+    version: "1.0"
+    status: registered
+    capabilities:
+      - system_observation
+      - service_inventory
+      - docker_inventory
+    # declarative_only 与 connected=false 禁止隐式连接。
+    connection:
+      mode: declarative_only
+      endpoint: null
+      connected: false
+    # 观察也需授权；环境执行在 V1.0 关闭。
+    safety_policy:
+      default_action: deny
+      observation_permission: READONLY
+      execution_enabled: false
+      require_tool_executor: true
+      require_approval_for: [CONTROLLED, ADMIN]
+
+# 未来 Linux、容器、服务、仿真和机器人公共字段。
+entry_schema:
+  required_fields:
+    - id
+    - type
+    - version
+    - status
+    - capabilities
+    - connection
+    - safety_policy
+  supported_types:
+    - linux_vps
+    - docker
+    - service
+    - ros2
+    - isaac_sim
+    - robot_hardware
+  status_enum: [registered, available, degraded, unavailable, disabled]
+  permission_enum: [READONLY, CONTROLLED, ADMIN]
+
+# 未注册 Environment 不可被观察或操作。
+validation:
+  unique_key: id
+  allow_unregistered_environments: false
+
+# ROS2、Isaac 或硬件扩展不得绕过安全策略。
+extensions: {}

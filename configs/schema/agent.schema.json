@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kai.local/schema/agent.schema.json",
+  "title": "Kai Agent Task Request V1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "task_id", "session_id", "user_request", "context", "allowed_tools", "memory_policy"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "task_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "session_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "user_request": {"type": "string", "minLength": 1, "maxLength": 100000},
+    "context": {"type": "object", "additionalProperties": true},
+    "allowed_tools": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "memory_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_layers", "write_layers"],
+      "properties": {
+        "read_layers": {"$ref": "#/$defs/layers"},
+        "write_layers": {"$ref": "#/$defs/layers"},
+        "user_consent": {"type": "boolean"},
+        "retention_days": {"type": ["integer", "null"], "minimum": 0},
+        "extensions": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "extensions": {"type": "object", "additionalProperties": true}
+  },
+  "$defs": {
+    "layers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["working", "episodic", "semantic", "user", "system"]}
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kai.local/schema/tool.schema.json",
+  "title": "Kai Tool Request V1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "request_id", "task_id", "session_id", "tool_name", "parameters", "permission_level", "timeout", "audit_id"],
+  "properties": {
+    "contract_version": {"const": "1.0"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "task_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "session_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "tool_name": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]{0,127}$"},
+    "parameters": {"type": "object", "additionalProperties": true},
+    "permission_level": {"enum": ["READONLY", "CONTROLLED", "ADMIN"]},
+    "timeout": {"type": "integer", "minimum": 1, "maximum": 3600},
+    "audit_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 256},
+    "extensions": {"type": "object", "additionalProperties": true}
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "version": "0.5.0",
+  "name": "Kai Infrastructure V0.5.0 Freeze",
+  "status": "frozen",
+  "components": [
+    {
+      "id": "infrastructure-layout",
+      "version": "1.0",
+      "status": "frozen"
+    },
+    {
+      "id": "core-contract",
+      "version": "1.0",
+      "status": "frozen"
+    },
+    {
+      "id": "memory-contract",
+      "version": "1.0",
+      "status": "frozen"
+    },
+    {
+      "id": "registry-layer",
+      "version": "1.0",
+      "status": "frozen"
+    },
+    {
+      "id": "registry-validator",
+      "version": "1.1",
+      "status": "frozen"
+    }
+  ],
+  "created_at": "2026-09-03T17:25:59Z"
+}

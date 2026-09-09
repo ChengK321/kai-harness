@@ -1,0 +1,54 @@
+# 五层 Memory 的生命周期、作用域和安全默认值。
+# Memory Manager 是唯一入口，Agent 不得直连物理存储。
+version: "1.0"
+default_action: deny
+
+memory:
+  # Working：可重建短期状态，不作为长期事实。
+  working:
+    enabled: true
+    scope: session
+    ttl_seconds: 86400
+    persistent: false
+  # Episodic：脱敏经验，受用户作用域与保留期约束。
+  episodic:
+    enabled: true
+    scope: user
+    ttl_days: 180
+    require_redaction: true
+  # Semantic：保留来源与置信度，索引只是派生数据。
+  semantic:
+    enabled: true
+    scope: tenant
+    ttl_days: 365
+    require_source: true
+    require_confidence: true
+  # User：需要明确同意，并支持导出与删除。
+  user:
+    enabled: true
+    scope: user
+    ttl_days: 365
+    require_consent: true
+    allow_export: true
+    allow_delete: true
+  # System：仅受信流程可写，Agent 默认不能修改。
+  system:
+    enabled: true
+    scope: system
+    ttl_days: null
+    write_roles:
+      - administrator
+
+# 到期处理覆盖主存、派生索引和受控备份。
+retention:
+  delete_expired: true
+  backup_expiry_enforced: true
+
+# 加密项是后端要求，不表示本文件保存密钥。
+security:
+  encrypt_at_rest: true
+  encrypt_in_transit: true
+  log_content: false
+
+# 扩展必须保留作用域、provenance 和默认拒绝语义。
+extensions: {}

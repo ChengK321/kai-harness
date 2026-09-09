@@ -1,0 +1,29 @@
+# Kai 基础默认配置；仅保存非敏感、跨组件共享的保守值。
+# 环境差异应使用受控覆盖层，禁止在此保存凭据。
+version: "1.0"
+environment: production
+
+# 统一目录约定；路径声明本身不授予读写权限。
+paths:
+  data: /opt/kai/data
+  runtime: /opt/kai/runtime
+  apps: /opt/kai/apps
+  logs: /opt/kai/logs
+  versions: /opt/kai/versions
+  backup: /opt/kai/backup
+
+# Runtime 通用边界；具体 Agent 预算见 agent-runtime.yaml。
+runtime:
+  request_timeout_seconds: 120
+  graceful_shutdown_seconds: 30
+  max_concurrent_tasks: 4
+  default_deny: true
+
+# 可观测性开关不负责启动外部监控服务。
+observability:
+  correlation_id: true
+  metrics_enabled: true
+  tracing_enabled: false
+
+# 预留兼容扩展，不得削弱默认拒绝策略。
+extensions: {}
