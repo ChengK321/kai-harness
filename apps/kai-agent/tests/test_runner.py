@@ -77,12 +77,20 @@ class RunnerTests(unittest.TestCase):
         prompt = "--tools Bash; $(touch /tmp/not-executed)"
         self.runner.run(self.workspace, prompt)
         self.process.assert_called_once_with(
-            ["claude", "-p", "--tools", "Read,Glob,Grep", "--max-turns", "5",
+            ["claude", "--bare", "--strict-mcp-config", "-p",
+             "--tools", "Read,Glob,Grep", "--max-turns", "5",
              "--output-format", "json", "--no-session-persistence", "--", prompt],
             cwd=self.workspace.resolve(), shell=False, capture_output=True,
             text=True, encoding="utf-8", errors="replace", timeout=300, check=False,
         )
         self.assertNotIn("env", self.process.call_args.kwargs)
+
+    def test_harness_isolation_flags_present(self):
+        self.runner.run(self.workspace, "test")
+        command = self.process.call_args.args[0]
+        self.assertIn("--bare", command)
+        self.assertIn("--strict-mcp-config", command)
+        self.assertNotIn("--dangerously-skip-permissions", command)
 
     def test_success_json(self):
         self.payload["permission_denials"] = [{"tool_name": "Read"}]

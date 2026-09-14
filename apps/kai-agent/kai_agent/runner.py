@@ -55,7 +55,7 @@ class ClaudeCodeRunner:
     def run(self, workspace: str | Path, prompt: str) -> HarnessResult:
         cwd = self.validate_workspace(workspace)
         command = [
-            "claude", "-p",
+            "claude", "--bare", "--strict-mcp-config", "-p",
             "--tools", "Read,Glob,Grep",
             "--max-turns", "5",
             "--output-format", "json",

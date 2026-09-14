@@ -35,6 +35,17 @@ JSON 输出，不持久化会话。CLI 参数数组以 `--` 分隔 prompt，
 Claude 报告的业务失败保留在 `success=False` 的结果中。
 CLI 将失败显示为清晰错误，并返回非零退出码。
 
+## 当前 Kai Harness execution boundary
+
+Claude Code runtime 的执行边界：
+
+- 显式使用 `--bare`（bare mode），避免自动加载 skills、plugins 等用户配置。
+- 使用 `--strict-mcp-config`，MCP servers 仅允许显式配置；当前 Runner
+  不传入 MCP 配置，因此禁用 MCP servers 的自动加载。
+- 工具限制为 `Read,Glob,Grep`，不使用 `--dangerously-skip-permissions`。
+
+Kai Harness 不实现 Agent 能力，只负责安全编排 Claude Code。
+
 ## 测试
 
 ```bash
