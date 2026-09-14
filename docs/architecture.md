@@ -1,5 +1,10 @@
 # Kai AI Agent Infrastructure V1.0 架构
 
+> **历史架构参考，不代表 Kai V0.6 当前运行架构。**
+> 当前 Kai 定位为 Agent Control Plane；本文中的自研 Runtime、Memory Manager
+> 和 Tool Executor 分层保留为历史设计资产。当前职责以
+> [架构定位](architecture-positioning.md)及 ADR-0001 为准，以下原文保留。
+
 ## 目标
 
 Kai V1.0 提供可审计、可扩展、可回滚的 Agent 基础设施。核心调用链如下：

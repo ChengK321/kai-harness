@@ -1,3 +1,6 @@
+# Future Design / Not Active Runtime
+# 历史设计参考，不是当前 Kai V0.6 Thin Harness Runner 的运行配置。
+# 当前定位见 ../docs/architecture-positioning.md；以下配置值原样保留。
 # Agent Runtime 声明式边界，不绑定具体 Agent 或 LLM。
 # 配置不包含凭据，也不会自行启动服务。
 version: "1.0"

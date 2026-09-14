@@ -38,3 +38,29 @@
 - Tool Executor
 - MCP Runtime
 - Robot Adapter
+
+## v0.6.0
+
+### Added
+
+- Added Kai Agent Control Plane architecture documentation.
+- Added V0.6 architecture positioning and documentation index.
+- Added workspace layout documentation.
+- Added Claude Code harness execution baseline.
+
+### Changed
+
+- Repositioned V0.5 Infrastructure design as historical/future architecture reference.
+- Clarified Kai responsibility as Agent Control Plane instead of standalone Agent Runtime.
+- Clarified separation between Control Plane, Agent Runtime and Environment.
+
+### Security
+
+- Maintained workspace-based execution boundary.
+- Maintained kaiagent isolated execution model.
+- No sudo, Docker or system service access granted to Agent execution layer.
+
+### Notes
+
+- V0.6 uses external Agent Runtime (Claude Code) through Harness Adapter.
+- Future Agent, Robot and Embodied AI integrations should extend through adapters.

@@ -1,5 +1,14 @@
 # Kai V1.0 Memory 设计
 
+> **Future Design / Not Active Runtime**
+>
+> 当前版本：Memory subsystem is design reference only.
+>
+> Current Kai does not implement persistent Agent Memory.
+>
+> 本文保留历史 Memory 设计，不代表当前已有 Memory Manager 或持久化后端。
+> 当前边界见 [架构定位](architecture-positioning.md)。以下历史设计原文保留。
+
 ## 设计原则
 
 Memory Manager 是唯一读写入口。所有记录必须带作用域、来源、时间、版本、敏感级别和保留策略；写入前进行授权与脱敏，读取时执行最小披露。用户可查看、更正和删除其可管理数据。

@@ -1,3 +1,7 @@
+# Future Design / Not Active Runtime
+# Memory subsystem is design reference only.
+# Current Kai does not implement persistent Agent Memory.
+# 当前定位见 ../docs/architecture-positioning.md；以下 enabled 值不表示组件已启用。
 # 五层 Memory 的生命周期、作用域和安全默认值。
 # Memory Manager 是唯一入口，Agent 不得直连物理存储。
 version: "1.0"

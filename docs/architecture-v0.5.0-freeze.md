@@ -1,5 +1,10 @@
 # Kai Infrastructure V0.5.0 Freeze
 
+> **历史冻结记录。** 本文保留 V0.5.0 契约与当时的路线，不改动其原有语义。
+> 第 5 节的「V0.6 Runtime Prototype」已不代表当前方向：Kai V0.6 转向
+> Agent Control Plane，复用 Claude Code Harness。当前定位见
+> [architecture-positioning.md](architecture-positioning.md)。以下原文保留。
+
 ## 1. 冻结目标
 
 V0.5.0 冻结 Kai AI Infrastructure 的基础目录、核心接口、Memory 契约、Registry 描述及 Registry Validator 安全边界，为后续 Runtime 原型提供稳定基线。

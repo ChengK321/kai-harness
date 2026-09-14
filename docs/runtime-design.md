@@ -1,5 +1,11 @@
 # Kai Agent Runtime V1.0 Design
 
+> **Future Design / Not Active Runtime**
+>
+> 本文保留历史自研 Runtime 设计，仅供参考，不代表当前实现或已承诺的路线。
+> Kai V0.6 定位为 Agent Control Plane，不实现 Agent loop、Planner 或 Tool Executor。
+> 当前边界见 [架构定位](architecture-positioning.md)。以下历史设计原文保留。
+
 ## 1. 目标与边界
 
 Kai Agent Runtime V1.0 是框架无关的任务编排层，负责生命周期、计划、执行协调、观察、恢复与人工介入。它不绑定 LLM，不直接执行系统命令或访问 Memory 后端，也不替代受控边界组件。
