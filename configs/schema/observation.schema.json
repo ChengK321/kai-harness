@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kai Observation Contract 1.0",
+  "description": "Design-only read-only environment observation; does not authorize actions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "timestamp", "environment_id"],
+  "properties": {
+    "version": {"type": "string", "const": "1.0"},
+    "timestamp": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "environment_id": {"type": "string", "minLength": 1},
+    "system": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpu": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "usage_percent": {"type": "number", "minimum": 0, "maximum": 100}
+          }
+        },
+        "memory": {"$ref": "#/$defs/capacity"},
+        "disk": {"$ref": "#/$defs/capacity"}
+      }
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[A-Za-z0-9][A-Za-z0-9_.:@-]{0,127}$": {"$ref": "#/$defs/service"}
+      }
+    },
+    "containers": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[A-Za-z0-9][A-Za-z0-9_.:@-]{0,127}$": {"$ref": "#/$defs/container"}
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "branch": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "dirty": {"type": "boolean"}
+      }
+    },
+    "security": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "severity", "summary"],
+            "properties": {
+              "code": {"type": "string", "minLength": 1},
+              "severity": {"enum": ["info", "warning", "critical", "unknown"]},
+              "summary": {"type": "string", "minLength": 1, "maxLength": 1024}
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "adapter_type": {"enum": ["vps", "docker", "ros2", "robot_hardware"]},
+        "adapter_version": {"type": "string", "minLength": 1},
+        "collection_status": {"enum": ["complete", "partial", "failed"]},
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["section", "code", "message"],
+            "properties": {
+              "section": {"enum": ["system", "services", "containers", "repository", "security", "environment"]},
+              "code": {"type": "string", "minLength": 1},
+              "message": {"type": "string", "minLength": 1, "maxLength": 1024}
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "capacity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "total_bytes": {"type": "integer", "minimum": 0},
+        "used_bytes": {"type": "integer", "minimum": 0}
+      }
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["running", "stopped", "failed", "unknown"]}
+      }
+    },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["running", "stopped", "paused", "restarting", "failed", "unknown"]}
+      }
+    }
+  }
+}
