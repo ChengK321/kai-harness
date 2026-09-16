@@ -64,3 +64,28 @@
 
 - V0.6 uses external Agent Runtime (Claude Code) through Harness Adapter.
 - Future Agent, Robot and Embodied AI integrations should extend through adapters.
+
+## V0.7.0
+
+### Added
+
+- Observation Contract V1.0
+- Observation Adapter interface
+- VPS Observation Adapter prototype
+- Observation Provider abstraction
+- ADR-0001 Observation Provider Boundary
+
+### Architecture
+
+- Established:
+  Harness → Observation Provider → Environment Adapter
+
+- Observation layer remains read-only.
+- No runtime execution or automatic remediation introduced.
+
+### Security
+
+- No environment mutation.
+- No shell execution.
+- No network access.
+- No credential handling.

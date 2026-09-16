@@ -20,6 +20,9 @@ V0.5 文档保留作为设计资产，不代表当前运行架构。
 
 ## 3. Future Evolution
 
+- [V0.8 Action Plane](action-design.md)：环境动作安全控制边界，D0 仅设计、待人工审核，未启用执行。
+- [Action Schema 草案](action-schema-draft.md)：字段、约束及旧契约映射；尚未创建 JSON Schema。
+- [ADR-0002 Action Boundary](adr/0002-action-boundary.md)：动作边界选择、取舍和执行前提。
 - [Robot Agent](v0.6-control-plane-architecture.md#6-future-extension)：未来通过 Adapter 接入机器人 Agent。
 - [ROS2 Environment](runtime-design.md#11-未来机器人扩展)：历史设计中的 ROS2 环境扩展参考。
 - Embodied AI：未来具身智能方向，参考 Robot Agent 与 ROS2 Environment 设计；尚不代表当前运行能力。

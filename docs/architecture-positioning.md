@@ -47,3 +47,17 @@ Kai 不实现持久化 Agent Memory，也不建立自己的模型 Provider Frame
 目录或配置中的 `enabled: true` 不构成当前组件已启动的证据。
 
 workspace 目录约定见 [workspace-layout.md](workspace-layout.md)。
+
+## V0.8 反膨胀定位补充（待人工审核）
+
+在 Agent Framework、Workflow Engine、Robot Framework 与 AI Control Plane 四种定位中，
+Kai 选择 **AI Control Plane**，具体范围仍是外部 Agent 与 Environment 的薄控制面。
+此表述不扩张为通用 AI 平台，也不改变上述 Agent Control Plane 定位。
+
+Observation 保留为应用层只读状态摘要，不替代 ROS2、MCP Resource 或遥测系统。
+Action 仅在存在明确授权、审批、资源绑定或证据关联缺口时保留最小契约；
+既有 MCP Tool 能满足边界要求时优先复用，不另建 Tool Protocol、Executor 或 Workflow。
+此方向不解除现有 Registry 的执行禁用及 require_tool_executor 约束。
+
+详细职责见 [架构边界矩阵](architecture-boundary-matrix.md)及
+[架构非目标](architecture-non-goals.md)。V0.5 历史设计继续保留，不作为重新自研运行时的路线。
