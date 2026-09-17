@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "intent_id": "test-001",
+  "requester": {
+    "type": "human",
+    "id": "user"
+  },
+  "environment": {
+    "environment_id": "vps-prod"
+  },
+  "target": {
+    "resource": "nginx"
+  },
+  "purpose": "restart service",
+  "risk": "HIGH",
+  "approval": {
+    "required": true,
+    "reference": "a001"
+  },
+  "verification": {
+    "required": true,
+    "evidence_type": "observation"
+  },
+  "workflow": [
+    "restart"
+  ]
+}
