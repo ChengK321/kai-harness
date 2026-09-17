@@ -22,20 +22,22 @@ class ValidatorTests(unittest.TestCase):
 
     def test_valid_intent(self):
         report = self.validator.validate(self.intent).to_dict()
-        self.assertEqual(report["status"], "allow")
+        self.assertEqual(report["validation"], "passed")
         self.assertEqual(report["intent_id"], "intent-001")
         self.assertTrue(all(c["status"] == "passed" for c in report["checks"]))
+        self.assertNotIn("approved", report)
+        self.assertNotIn("execute", report)
         json.dumps(report, allow_nan=False)
 
     def test_missing_environment(self):
         del self.intent["environment"]
         report = self.validator.validate(self.intent)
-        self.assertEqual(report.status, "deny")
+        self.assertEqual(report.validation, "failed")
         self.assertTrue(any(c.name == "environment_binding" and c.status == "failed" for c in report.checks))
 
     def test_missing_approval(self):
         del self.intent["approval"]
-        self.assertEqual(self.validator.validate(self.intent).status, "deny")
+        self.assertEqual(self.validator.validate(self.intent).validation, "failed")
 
     def test_all_required_fields(self):
         schema = json.loads((Path(__file__).resolve().parents[3] /
@@ -45,19 +47,19 @@ class ValidatorTests(unittest.TestCase):
             with self.subTest(key=key):
                 value = copy.deepcopy(self.intent)
                 del value[key]
-                self.assertEqual(self.validator.validate(value).status, "deny")
+                self.assertEqual(self.validator.validate(value).validation, "failed")
 
     def test_command_rejected(self):
         self.intent["command"] = "systemctl restart nginx"
-        self.assertEqual(self.validator.validate(self.intent).status, "deny")
+        self.assertEqual(self.validator.validate(self.intent).validation, "failed")
 
     def test_tool_name_rejected(self):
         self.intent["tool_name"] = "restart_service"
-        self.assertEqual(self.validator.validate(self.intent).status, "deny")
+        self.assertEqual(self.validator.validate(self.intent).validation, "failed")
 
     def test_model_reasoning_rejected(self):
         self.intent["model_reasoning"] = "private"
-        self.assertEqual(self.validator.validate(self.intent).status, "deny")
+        self.assertEqual(self.validator.validate(self.intent).validation, "failed")
 
     def test_nested_forbidden_fields(self):
         for key in ("command", "tool_name", "shell", "executor", "workflow", "retry",
@@ -66,32 +68,38 @@ class ValidatorTests(unittest.TestCase):
                 value = copy.deepcopy(self.intent)
                 value["target"][key] = "forbidden"
                 report = self.validator.validate(value)
-                self.assertEqual(report.status, "deny")
+                self.assertEqual(report.validation, "failed")
                 self.assertTrue(any(c.name == "executable_fields" and c.status == "failed" for c in report.checks))
 
     def test_invalid_risk(self):
         for risk in ("SAFE", None, [], {}, 3):
             self.intent["risk"] = risk
-            self.assertEqual(self.validator.validate(self.intent).status, "deny")
+            self.assertEqual(self.validator.validate(self.intent).validation, "failed")
 
     def test_low_risk_without_manual_approval(self):
         self.intent["risk"] = "LOW"
         self.intent["approval"] = {"required": False, "reference": None}
-        self.assertEqual(self.validator.validate(self.intent).status, "allow")
+        self.assertEqual(self.validator.validate(self.intent).validation, "passed")
 
-    def test_high_risk_pending_is_not_authorization(self):
+    def test_high_risk_requires_approval_declaration(self):
         for risk in ("HIGH", "CRITICAL"):
             self.intent["risk"] = risk
             self.intent["approval"] = {"required": False, "reference": None}
-            self.assertEqual(self.validator.validate(self.intent).status, "deny")
+            self.assertEqual(self.validator.validate(self.intent).validation, "failed")
             self.intent["approval"]["required"] = True
-            self.assertEqual(self.validator.validate(self.intent).status, "allow")
+            self.assertEqual(self.validator.validate(self.intent).validation, "passed")
+
+    def test_validation_is_not_authorization(self):
+        report = self.validator.validate(self.intent).to_dict()
+        self.assertEqual(report["validation"], "passed")
+        self.assertNotIn("authorization", report)
+        self.assertNotIn("execution", report)
 
     def test_address_fields_rejected(self):
         for key in ("host", "hostname", "ip", "ssh"):
             value = copy.deepcopy(self.intent)
             value["environment"][key] = "1.2.3.4"
-            self.assertEqual(self.validator.validate(value).status, "deny")
+            self.assertEqual(self.validator.validate(value).validation, "failed")
 
     def test_closed_shapes_and_types(self):
         changes = [
@@ -109,29 +117,29 @@ class ValidatorTests(unittest.TestCase):
             with self.subTest(key=key, replacement=replacement):
                 value = copy.deepcopy(self.intent)
                 value[key] = replacement
-                self.assertEqual(self.validator.validate(value).status, "deny")
+                self.assertEqual(self.validator.validate(value).validation, "failed")
 
     def test_non_objects_and_malformed_sections(self):
         for value in (None, [], "intent", 1):
-            self.assertEqual(self.validator.validate(value).status, "deny")
+            self.assertEqual(self.validator.validate(value).validation, "failed")
         for key in ("requester", "environment", "target", "approval", "verification"):
             for malformed in (None, [], "bad", 1):
                 value = copy.deepcopy(self.intent)
                 value[key] = malformed
-                self.assertEqual(self.validator.validate(value).status, "deny")
+                self.assertEqual(self.validator.validate(value).validation, "failed")
 
     def test_file_input_read_only(self):
         with patch("pathlib.Path.open", mock_open(read_data=json.dumps(self.intent))) as opened:
-            self.assertEqual(self.validator.validate_file("intent.json").status, "allow")
+            self.assertEqual(self.validator.validate_file("intent.json").validation, "passed")
             opened.assert_called_once_with("r", encoding="utf-8")
 
     def test_invalid_file_input(self):
         for data in ("not json", '{"risk":"LOW","risk":"HIGH"}', '{"risk":NaN}', "[]"):
             with patch("pathlib.Path.open", mock_open(read_data=data)):
-                self.assertEqual(self.validator.validate_file("intent.json").status, "deny")
+                self.assertEqual(self.validator.validate_file("intent.json").validation, "failed")
         with patch("pathlib.Path.open", side_effect=OSError("private path")):
             report = self.validator.validate_file("missing.json")
-            self.assertEqual(report.status, "deny")
+            self.assertEqual(report.validation, "failed")
             self.assertNotIn("private path", json.dumps(report.to_dict()))
 
     def test_no_side_effects_or_input_mutation(self):
@@ -141,7 +149,7 @@ class ValidatorTests(unittest.TestCase):
              patch("socket.socket", side_effect=AssertionError("network forbidden")), \
              patch("builtins.open", side_effect=AssertionError("IO forbidden")), \
              patch("pathlib.Path.open", side_effect=AssertionError("IO forbidden")):
-            self.assertEqual(self.validator.validate(self.intent).status, "allow")
+            self.assertEqual(self.validator.validate(self.intent).validation, "passed")
         self.assertEqual(self.intent, original)
         self.assertFalse(hasattr(self.validator, "__dict__"))
 
