@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kai Governance Intent Contract V1.0",
+  "description": "Governance Intent is declarative, not executable. Structural validity is not authentication, approval or execution authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "intent_id", "requester", "environment", "target", "purpose", "risk", "approval", "verification"],
+  "properties": {
+    "version": {"type": "string", "const": "1.0"},
+    "intent_id": {
+      "type": "string", "minLength": 1, "maxLength": 128, "pattern": "\\S",
+      "description": "Unique governance request identity. Uniqueness must be enforced outside JSON Schema."
+    },
+    "requester": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"type": "string", "enum": ["human", "service"]},
+        "id": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "\\S"}
+      },
+      "description": "Identity bound by an authenticated ingress, never established by a model's self-report."
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment_id"],
+      "properties": {
+        "environment_id": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "\\S"}
+      },
+      "description": "Registry identity only, not a hostname, IP address or SSH destination; Registry resolution is an external semantic check."
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resource"],
+      "properties": {
+        "resource": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"}
+      },
+      "description": "Logical resource within the bound environment, such as service/nginx or robot/arm01. No execution method."
+    },
+    "purpose": {
+      "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "\\S",
+      "description": "User goal summary only, not chain of thought, a prompt or executable instructions."
+    },
+    "risk": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "reference"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "reference": {"type": ["string", "null"], "minLength": 1, "maxLength": 128, "pattern": "\\S"}
+      },
+      "description": "Trusted-policy approval requirement and optional opaque record reference. A null reference may mean pending; a reference does not prove approval."
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "evidence_type"],
+      "properties": {
+        "required": {"type": "boolean"},
+        "evidence_type": {"type": "string", "const": "observation"}
+      },
+      "description": "Verification requirement, not evidence or a claim of success. Version 1.0 supports observation evidence only."
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"risk": {"enum": ["HIGH", "CRITICAL"]}}, "required": ["risk"]},
+      "then": {"properties": {"approval": {"properties": {"required": {"const": true}}}}}
+    }
+  ]
+}

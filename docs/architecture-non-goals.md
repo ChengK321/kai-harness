@@ -39,3 +39,17 @@ MCP 工具的只读提示或 Adapter 元数据也不构成系统级权限保证�
 “Control Plane”的命名掩盖职责扩大。涉及新执行入口的设计认可不等于部署授权。
 
 详见 [边界矩阵与生态比较](architecture-boundary-matrix.md)。
+
+## V0.8-D1：Governance Boundary（待人工审核）
+
+在环境动作路径中，Kai 不拥有 **Decision Making、Task Planning、Action Execution Logic**。
+领域决策与任务规划属于外部 Agent，执行逻辑属于 Existing Tool / MCP 服务 / Environment Adapter。
+Kai 只负责 **Governance Boundary**：环境与主体绑定、权限约束、审批引用、审计和验证关联。
+
+治理检查是否满足既有约束，不代表 Kai 决定下一步业务动作。机器人 safety/collision check
+由专业系统执行，Kai 只核对所需证据；不实现轨迹规划或实时控制。
+验证失败不授权自动修复、回滚或重试。
+
+Action 是 Governed Action Intent，不是新的 Tool Wrapper；既有工具能力充分时无需重复封装。
+详见 [D1 Governance 设计](action-governance-design.md)和
+[ADR-0003](adr/0003-action-governance-boundary.md)。本补充不改变历史配置或启用环境执行。
