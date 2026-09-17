@@ -52,13 +52,13 @@ def _invalid_constant(value):
 
 
 class GovernanceValidator:
-    """Stateless offline validation, not a policy or authorization engine."""
+    """Stateless offline contract validation, not authorization or execution."""
 
     __slots__ = ()
 
     def validate(self, intent: object) -> GovernanceDecisionReport:
         if not isinstance(intent, dict):
-            return GovernanceDecisionReport("deny", None, (
+            return GovernanceDecisionReport("failed", None, (
                 CheckResult("required_fields", "failed", "Intent must be a JSON object."),
             ))
 
@@ -100,19 +100,19 @@ class GovernanceValidator:
               "Verification must declare a boolean required and observation evidence_type only.")
         identifier = intent.get("intent_id")
         return GovernanceDecisionReport(
-            "allow" if all(item.status == "passed" for item in checks) else "deny",
+            "passed" if all(item.status == "passed" for item in checks) else "failed",
             identifier if _text(identifier, 128) else None,
             tuple(checks),
         )
 
     def validate_file(self, path: str | Path) -> GovernanceDecisionReport:
-        """Read a caller-selected local JSON file, never follow intent references."""
+        """Read a caller-selected local JSON file for offline validation only."""
         try:
             with Path(path).open("r", encoding="utf-8") as stream:
                 intent = json.load(stream, object_pairs_hook=_unique_object,
                                    parse_constant=_invalid_constant)
         except (OSError, ValueError, RecursionError):
-            return GovernanceDecisionReport("deny", None, (
+            return GovernanceDecisionReport("failed", None, (
                 CheckResult("input_json", "failed", "Cannot read a valid local JSON intent."),
             ))
         return self.validate(intent)
