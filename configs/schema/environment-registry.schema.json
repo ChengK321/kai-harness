@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kai Environment Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "environment_id", "type", "trust_level", "capabilities"],
+  "properties": {
+    "version": {"type": "string"},
+    "environment_id": {"type": "string"},
+    "type": {"type": "string"},
+    "trust_level": {
+      "type": "string",
+      "enum": ["readonly", "controlled", "admin"]
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "provider"],
+        "properties": {
+          "name": {"type": "string"},
+          "provider": {"type": "string"}
+        }
+      }
+    }
+  }
+}
