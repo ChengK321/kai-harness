@@ -112,3 +112,16 @@ required=false 必须符合外部受信政策，不应被当作通用绕过验�
 现有执行阻断保持；不创建 apps、Executor、Runtime、Action Adapter 或测试执行器。
 结构校验示例见 [schema-validation-examples.md](schema-validation-examples.md)，
 不将示例误认为真实授权或运行测试结果。
+
+## V0.8-D3：离线 Validator 结果边界
+
+Governance Validator result does not mean:
+
+- authorized execution
+- successful execution
+- environment safety
+
+`allow` 只表示：intent satisfies Kai governance boundary checks。
+它不验证真实身份、Registry 成员或审批有效性，也不读取环境。
+`deny` 表示至少一项固定离线检查未通过，不会执行拒绝后的修复或重试。
+详见 [Governance Validator 设计](governance-validator-design.md)。
