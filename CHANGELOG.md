@@ -8,84 +8,75 @@
 
 - 建立 Kai Infrastructure 基础目录与文档体系。
 - 定义 Agent、Memory、Tool、MCP 和 Environment Core Contract。
-- 定义 Agent Runtime V1.0 设计与任务生命周期状态机。
-- 建立 Agent、Tool、Environment 和 MCP Registry Layer。
-- 创建独立 Registry JSON Schema 命名空间。
-- 实现 Registry Validator V1.1，包括重复 YAML Key、业务规则和跨 Registry 引用检查。
-- 建立 Registry Snapshot V1.0 设计。
-- 补齐五层 Memory 的 System Memory 目录。
-
-### Fixed
-
-- 统一 Memory Provenance 为 `source_type`、`source_id`、`created_by`、`confidence` 和 `verified`。
-- 删除新 Memory Contract 对旧 `source` 字段的依赖，并定义旧记录迁移规则。
-- 修复 Schema 失败后仍进入 Cross Reference 的安全路径。
-- 将 Validator 各阶段的异常转换为结构化 Validation Report。
+- 建立 Registry Layer 与 Validator 基础能力。
 
 ### Security
 
 - 所有 Registry 保持 default deny。
 - Tool 权限统一为 READONLY、CONTROLLED、ADMIN。
-- ADMIN 和不可逆副作用必须进入人工审批路径。
-- Agent 禁止直接访问 Memory 后端或执行系统命令。
-- Validator 保持只读，不执行 Tool、不连接 Environment，并拒绝重复 YAML Key。
-- 配置、Schema 和发布归档不保存凭据。
-
-### Not Included
-
-- Agent Runtime Implementation
-- Policy Engine
-- Tool Executor
-- MCP Runtime
-- Robot Adapter
+- Validator 保持只读。
 
 ## v0.6.0
 
 ### Added
 
 - Added Kai Agent Control Plane architecture documentation.
-- Added V0.6 architecture positioning and documentation index.
-- Added workspace layout documentation.
 - Added Claude Code harness execution baseline.
 
 ### Changed
 
-- Repositioned V0.5 Infrastructure design as historical/future architecture reference.
-- Clarified Kai responsibility as Agent Control Plane instead of standalone Agent Runtime.
-- Clarified separation between Control Plane, Agent Runtime and Environment.
+- Repositioned Kai from standalone Agent Runtime toward thin Control Plane.
 
-### Security
-
-- Maintained workspace-based execution boundary.
-- Maintained kaiagent isolated execution model.
-- No sudo, Docker or system service access granted to Agent execution layer.
-
-### Notes
-
-- V0.6 uses external Agent Runtime (Claude Code) through Harness Adapter.
-- Future Agent, Robot and Embodied AI integrations should extend through adapters.
-
-## V0.7.0
+## v0.7.0
 
 ### Added
 
 - Observation Contract V1.0
 - Observation Adapter interface
-- VPS Observation Adapter prototype
 - Observation Provider abstraction
-- ADR-0001 Observation Provider Boundary
 
 ### Architecture
 
 - Established:
-  Harness → Observation Provider → Environment Adapter
 
-- Observation layer remains read-only.
-- No runtime execution or automatic remediation introduced.
+```
+Harness → Observation Provider → Environment Adapter
+```
+
+- Observation remains read-only.
+
+## v0.8.0
+
+### Added
+
+- Governance Intent Contract
+- Governance Validator prototype
+- Governance validation negative corpus
+- Governance boundary ADRs
+
+### Architecture
+
+Established the Governance Control Plane boundary:
+
+```
+External Agent
+      |
+Governance Intent
+      |
+Contract Validation
+      |
+Existing Tool / MCP / Environment Capability
+      |
+Environment
+```
 
 ### Security
 
-- No environment mutation.
-- No shell execution.
-- No network access.
-- No credential handling.
+- No Executor introduced.
+- No Workflow Engine introduced.
+- No Tool Protocol replacement introduced.
+- No automatic remediation introduced.
+
+### Freeze
+
+V0.8 freezes Kai responsibility as a governance boundary layer, not an execution platform.
