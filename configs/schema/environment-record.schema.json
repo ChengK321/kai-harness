@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kai Environment Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["environment_id", "environment_type", "trust_level", "capabilities"],
+  "properties": {
+    "environment_id": {"type": "string", "minLength": 1},
+    "environment_type": {"type": "string", "minLength": 1},
+    "trust_level": {"type": "string", "enum": ["unknown", "trusted"]},
+    "capabilities": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}
